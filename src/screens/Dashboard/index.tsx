@@ -1,5 +1,5 @@
 import React from 'react';
-import { HighlightCard } from '../../components/HighlightCard';
+import { HighlightCard, TransactionCard } from '../../components';
 
 import { 
   Container, 
@@ -11,7 +11,9 @@ import {
   UserGreeting,
   UserName,
   Icon,
-  HighlightCards
+  HighlightCards,
+  Transactions,
+  Title
 } from './styles';
 
 export const Dashboard = () => {
@@ -55,6 +57,12 @@ export const Dashboard = () => {
           type="total"
         />
       </HighlightCards>
+
+      <Transactions>
+        <Title>Listagem</Title> 
+
+        <TransactionCard />
+      </Transactions>
     </Container>
   );
 };
