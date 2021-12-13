@@ -83,3 +83,7 @@ export const Title = styled.Text`
   color: ${({ theme }) => theme.colors.text_dark};
   margin-bottom: 16px;
 `;
+
+export const TransactionList = styled.FlatList`
+  
+`;

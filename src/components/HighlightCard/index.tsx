@@ -24,8 +24,7 @@ const icon = {
 };
 
 export const HighlightCard = (props: TProps) => {
-  const { title, amount, lastTransaction, type } = props
-
+  const { title, amount, lastTransaction, type } = props;
 
   return (
     <Container type={type}>
