@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-native';
+import { useForm } from 'react-hook-form'
 
 import { CategorySelect } from '../../screens';
 
 import { 
-  Input, 
+  InputForm, 
   Button, 
   TransactionTypeButton,
   CategorySelectButton
@@ -19,6 +20,11 @@ import {
   TransactionsTypes
 } from './styles';
 
+type TFormData = {
+  name: string;
+  amount: string;
+}
+
 export const Register = () => {
   const [transactionType, setTransactionType] = useState('');
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -26,6 +32,8 @@ export const Register = () => {
     key: 'category',
     name: 'Categoria',
   });
+
+  const { control, handleSubmit } = useForm();
 
   const handleTransactionTypeSelect = (type: 'up' | 'down') => {
     setTransactionType(type);
@@ -39,6 +47,17 @@ export const Register = () => {
     setCategoryModalOpen(false);
   };
 
+  const handleRegister = (form: TFormData) => {
+    const data = {
+      name: form.name,
+      amount: form.amount,
+      transactionType,
+      category: category.name,
+    };
+
+    console.log(data);
+  };
+
   return (
     <Container>
       <Header>
@@ -47,8 +66,17 @@ export const Register = () => {
 
       <Form>
         <Fields>
-          <Input placeholder="Nome" />
-          <Input placeholder="Preço" />
+          <InputForm 
+            placeholder="Nome" 
+            name="name"
+            control={control}
+          />
+          
+          <InputForm 
+            placeholder="Preço"
+            name="amount"
+            control={control}
+          />
 
           <TransactionsTypes>
             <TransactionTypeButton 
@@ -72,7 +100,10 @@ export const Register = () => {
           />
         </Fields>
 
-        <Button title="Enviar" />
+        <Button 
+          title="Enviar" 
+          onPress={handleSubmit(handleRegister)} 
+        />
       </Form>
 
       <Modal visible={categoryModalOpen}>
