@@ -4,13 +4,14 @@ import { Container, Category, Icon } from './styles';
 
 type TProps = {
   title: string;
+  onPress: () => void;
 };
 
-export const CategorySelect = (props: TProps) => {
-  const { title } = props;
+export const CategorySelectButton = (props: TProps) => {
+  const { title, onPress } = props;
 
   return (
-    <Container>
+    <Container onPress={onPress}>
       <Category>{title}</Category>
       <Icon name="chevron-down" />
     </Container>

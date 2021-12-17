@@ -21,13 +21,17 @@ type TCategory = {
 };
 
 type TProps = {
-  category: string;
+  category: TCategory;
   setCategory: (category: TCategory) => void;
   closeSelectCategory: () => void;
 };
 
 export const CategorySelect = (props: TProps) => {
   const { category, setCategory, closeSelectCategory } = props;
+
+  const handleCategorySelect = (item: TCategory) => {
+    setCategory(item);
+  };
 
   return (
     <Container>
@@ -40,7 +44,10 @@ export const CategorySelect = (props: TProps) => {
         style={{ flex: 1, width: '100%' }}
         keyExtractor={(item) => item.key}
         renderItem={({ item }) => (
-          <Category>
+          <Category 
+            onPress={() => handleCategorySelect(item)}
+            isActive={category.key === item.key}
+          >
             <Icon name={item.icon} />
             <Name>{item.name}</Name>
           </Category>
@@ -49,7 +56,10 @@ export const CategorySelect = (props: TProps) => {
       />
 
       <Footer>
-        <Button title="Selecionar" />
+        <Button 
+          title="Selecionar" 
+          onPress={closeSelectCategory}
+        />
       </Footer>
     </Container>
   )
