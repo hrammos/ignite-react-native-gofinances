@@ -4,15 +4,16 @@ import { TextInputProps } from 'react-native';
 
 import { Input } from '../../../components'
 
-import { Container } from './styles';
+import { Container, Error } from './styles';
 
 type TProps = TextInputProps & {
   control: Control;
   name: string;
+  error?: string;
 }
 
 export const InputForm = (props: TProps) => {
-  const { name, control, ...rest } = props;
+  const { name, control, error, ...rest } = props;
 
   return (
     <Container>
@@ -27,6 +28,7 @@ export const InputForm = (props: TProps) => {
           />
         )}
       />
+      {error && <Error>{error}</Error>}
     </Container>
   )
 };
