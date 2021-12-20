@@ -7,7 +7,14 @@ import {
 } from 'react-native';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
+import {
+  useNavigation,
+  NavigationProp,
+  ParamListBase,
+} from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 
 import { CategorySelect } from '../../screens';
@@ -52,10 +59,15 @@ export const Register = () => {
     name: 'Categoria',
   });
 
+  const dataKey = '@gofinances:transactions';
+
+  const { navigate }: NavigationProp<ParamListBase> = useNavigation();
+
   const { 
     control, 
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -72,7 +84,7 @@ export const Register = () => {
     setCategoryModalOpen(false);
   };
 
-  const handleRegister = (form: TFormData) => {
+  const handleRegister = async (form: TFormData) => {
     if (!transactionType) {
       return Alert.alert('Selecione o tipo da transação');
     }
@@ -81,14 +93,38 @@ export const Register = () => {
       return Alert.alert('Selecione a categoria');
     }
 
-    const data = {
+    const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
       transactionType,
       category: category.name,
+      date: new Date()
     };
 
-    console.log(data);
+    try {
+      const transactions = await AsyncStorage.getItem(dataKey);
+      const currentTransactions = transactions ? JSON.parse(transactions) : [];
+
+      const dataFormatted = [
+        ...currentTransactions,
+        newTransaction
+      ];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+
+      reset();
+      setTransactionType('')
+      setCategory({
+        key: 'category',
+        name: 'Categoria',
+      });
+
+      navigate('Listagem');
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Não foi possível salvar');
+    }
   };
 
   return (
