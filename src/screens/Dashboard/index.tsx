@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HighlightCard, TransactionCard } from '../../components';
 
 import { 
@@ -19,40 +21,54 @@ import {
   TransactionList,
 } from './styles';
 
-export const Dashboard = () => {
-  const data = [
-    {
-      title: 'Desenvolvimento de site',
-      amount: 'R$ 12.000,00',
-      category: {
-        name: 'Vendas',
-        icon: 'dollar-sign'
-      },
-      date: '13/04/2021',
-      type: 'positive'
-    },
-    {
-      title: 'Hamburgueria Pizzy',
-      amount: 'R$ 59,00',
-      category: {
-        name: 'Alimentação',
-        icon: 'coffee'
-      },
-      date: '10/04/2021',
-      type: 'negative'
+import { TTransactionCard } from '../../components/TransactionCard';
 
-    },
-    {
-      title: 'Aluguel do apartamento',
-      amount: 'R$ 1.200,00',
-      category: {
-        name: 'Casa',
-        icon: 'shopping-bag'
-      },
-      date: '10/04/2021',
-      type: 'negative'
-    },
-];
+type TData = TTransactionCard & {
+  id: string
+};
+
+export const Dashboard = () => {
+  const [data, setData] = useState<TData[]>([]);
+  
+  const loadTransactions = async () => {
+    const dataKey = '@gofinances:transactions';
+    const response = await AsyncStorage.getItem(dataKey);
+    const transactions = response ? JSON.parse(response) : [];
+
+    const transactionsFormatted: TData[] = transactions.map((item: TData) => {
+      const amount = Number(item.amount).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      });
+
+      const date = Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(item.date));
+
+      return {
+        id: item.id,
+        name: item.name,
+        amount,
+        type: item.type,
+        category: item.category,
+        date,
+      };
+    });
+
+    setData(transactionsFormatted);
+  }
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactions();
+    }, [])
+  );
 
   return (
     <Container>

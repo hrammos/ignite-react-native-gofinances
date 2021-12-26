@@ -38,7 +38,7 @@ import {
 type TFormData = {
   name: string;
   amount: string;
-}
+};
 
 const schema = Yup.object().shape({
   name: Yup
@@ -59,7 +59,6 @@ export const Register = () => {
     name: 'Categoria',
   });
 
-  const dataKey = '@gofinances:transactions';
 
   const { navigate }: NavigationProp<ParamListBase> = useNavigation();
 
@@ -72,7 +71,7 @@ export const Register = () => {
     resolver: yupResolver(schema),
   });
 
-  const handleTransactionTypeSelect = (type: 'up' | 'down') => {
+  const handleTransactionTypeSelect = (type: 'positive' | 'negative') => {
     setTransactionType(type);
   };
 
@@ -97,12 +96,13 @@ export const Register = () => {
       id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
-      transactionType,
-      category: category.name,
+      type: transactionType,
+      category: category.key,
       date: new Date()
     };
 
     try {
+      const dataKey = '@gofinances:transactions';
       const transactions = await AsyncStorage.getItem(dataKey);
       const currentTransactions = transactions ? JSON.parse(transactions) : [];
 
@@ -114,7 +114,7 @@ export const Register = () => {
       await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
 
       reset();
-      setTransactionType('')
+      setTransactionType('');
       setCategory({
         key: 'category',
         name: 'Categoria',
@@ -122,7 +122,7 @@ export const Register = () => {
 
       navigate('Listagem');
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Alert.alert('Não foi possível salvar');
     }
   };
@@ -156,17 +156,17 @@ export const Register = () => {
 
           <TransactionsTypes>
             <TransactionTypeButton 
-              onPress={() => handleTransactionTypeSelect('up')}
+              onPress={() => handleTransactionTypeSelect('positive')}
               title="Entrada" 
               type="up"
-              isActive={transactionType === 'up'}
+              isActive={transactionType === 'positive'}
             />
 
             <TransactionTypeButton 
-              onPress={() => handleTransactionTypeSelect('down')}
+              onPress={() => handleTransactionTypeSelect('negative')}
               title="Saída" 
               type="down" 
-              isActive={transactionType === 'down'}
+              isActive={transactionType === 'negative'}
             />
           </TransactionsTypes>
 
