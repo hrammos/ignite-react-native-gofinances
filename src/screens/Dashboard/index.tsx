@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
+import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HighlightCard, TransactionCard } from '../../components';
@@ -19,23 +19,48 @@ import {
   Transactions,
   Title,
   TransactionList,
+  LoadingContainer
 } from './styles';
 
 import { TTransactionCard } from '../../components/TransactionCard';
+import { useTheme } from 'styled-components/native';
 
-type TData = TTransactionCard & {
-  id: string
+export type TTransactions = TTransactionCard & {
+  id: string;
+};
+
+type THighlightProps = {
+  amount: string;
+};
+
+type THighlightData = {
+  entries: THighlightProps;
+  expensives: THighlightProps;
+  total: THighlightProps;
 };
 
 export const Dashboard = () => {
-  const [data, setData] = useState<TData[]>([]);
+  const [transactions, setTransactions] = useState<TTransactions[]>([]);
+  const [highlightData, setHighlightData] = useState<THighlightData>({} as THighlightData);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { colors } = useTheme();
   
   const loadTransactions = async () => {
     const dataKey = '@gofinances:transactions';
     const response = await AsyncStorage.getItem(dataKey);
-    const transactions = response ? JSON.parse(response) : [];
+    const _transactions = response ? JSON.parse(response) : [];
 
-    const transactionsFormatted: TData[] = transactions.map((item: TData) => {
+    let entriesTotal = 0;
+    let expensiveTotal = 0;
+
+    const transactionsFormatted: TTransactions[] = _transactions.map((item: TTransactions) => {
+      if (item.type === 'positive') {
+        entriesTotal += Number(item.amount);
+      } else {
+        expensiveTotal += Number(item.amount);
+      }
+
       const amount = Number(item.amount).toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
@@ -57,7 +82,32 @@ export const Dashboard = () => {
       };
     });
 
-    setData(transactionsFormatted);
+    setTransactions(transactionsFormatted);
+
+    const total = entriesTotal - expensiveTotal;
+
+    setHighlightData({
+      entries: {
+        amount: entriesTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+      expensives: {
+        amount: expensiveTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+      total: {
+        amount: total.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+    });
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -69,6 +119,12 @@ export const Dashboard = () => {
       loadTransactions();
     }, [])
   );
+
+  if (isLoading) return (
+    <LoadingContainer>
+      <ActivityIndicator color={colors.primary} size="large" />
+    </LoadingContainer> 
+  )
 
   return (
     <Container>
@@ -93,21 +149,21 @@ export const Dashboard = () => {
       <HighlightCards>
         <HighlightCard 
           title="Entradas"
-          amount="R$ 17.400,00"
+          amount={highlightData.entries.amount}
           lastTransaction="Última entrada dia 13 de abril"
           type="up"
         />
 
         <HighlightCard 
           title="Saídas"
-          amount="R$ 1.259,00"
+          amount={highlightData.expensives.amount}
           lastTransaction="Última saída dia 03 de abril"
           type="down"
         />
 
         <HighlightCard 
           title="Total"
-          amount="R$ 16.141,00"
+          amount={highlightData.total.amount}
           lastTransaction="01 à 16 de abril"
           type="total"
         />
@@ -117,12 +173,9 @@ export const Dashboard = () => {
         <Title>Listagem</Title> 
 
         <TransactionList 
-          data={data}
+          data={transactions}
+          keyExtractor={item => item.id}
           renderItem={({ item }) => <TransactionCard data={item} />}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: getBottomSpace()
-          }}
         />
       </Transactions>
     </Container>
