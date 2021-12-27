@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { useTheme } from 'styled-components';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Dashboard, Register } from '../screens';
+import { Dashboard, Register, Resume } from '../screens';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
@@ -53,7 +53,7 @@ export const AppRoutes = () => {
 
       <Screen 
         name="Resumo" 
-        component={Dashboard} 
+        component={Resume} 
         options={{
           tabBarIcon: (({ size, color }) => 
             <MaterialIcons 
