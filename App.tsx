@@ -16,6 +16,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AppRoutes } from './src/routes/app.routes';
 import { theme } from './src/global/styles/theme';
 
+import { SignIn } from './src/screens';
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -33,7 +35,8 @@ export default function App() {
           backgroundColor={theme.colors.primary}
           barStyle="light-content"
         />
-        <AppRoutes />
+        {/* <AppRoutes /> */}
+        <SignIn />
       </NavigationContainer>
     </ThemeProvider>
   );
