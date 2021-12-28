@@ -1,12 +1,14 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { VictoryPie } from 'victory-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { addMonths, subMonths, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'styled-components/native';
 
-import { HistoryCard } from '../../components';
+import { HistoryCard, Loading } from '../../components';
 
 import { 
   Container,
@@ -33,16 +35,33 @@ type TCategoryData = {
 };
 
 export const Resume = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [totalByCategories, setTotalByCategories] = useState<TCategoryData[]>([]);
 
   const { colors } = useTheme();
 
+  const handleDateChange = (action: 'next' | 'prev') => {
+    if (action === 'next') {
+      setSelectedDate(addMonths(selectedDate, 1));
+    } else {
+      setSelectedDate(subMonths(selectedDate, 1));
+    }
+  };
+
   const loadData = async () => {
+    setIsLoading(true);
+
     const dataKey = '@gofinances:transactions';
     const transactions = await AsyncStorage.getItem(dataKey);
     const currentTransactions = transactions ? JSON.parse(transactions) : [];
 
-    const expensives = currentTransactions.filter((transaction: TTransactions)=> transaction.type === 'negative');
+    const expensives = currentTransactions
+      .filter((transaction: TTransactions) => 
+        transaction.type === 'negative' &&
+        new Date(transaction.date).getMonth() === selectedDate.getMonth() &&
+        new Date(transaction.date).getFullYear() === selectedDate.getFullYear()
+      );
 
     const expensivesTotal = expensives.reduce((accumulator: number, expensive: TTransactions) => {
       return accumulator + Number(expensive.amount);
@@ -79,17 +98,23 @@ export const Resume = () => {
     });
 
     setTotalByCategories(totalByCategory);
+    setIsLoading(false);
   };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [])
+    }, [selectedDate])
   );
+
+  if (isLoading) return (
+    <Container>
+      <Header>
+        <Title>Resumo por categoria</Title>
+      </Header>
+      <Loading />
+    </Container>
+  )
 
   return (
     <Container>
@@ -105,13 +130,13 @@ export const Resume = () => {
         }}
       >
         <MonthSelect>
-          <MonthSelectButton>
+          <MonthSelectButton onPress={() => handleDateChange('prev')}>
             <MonthSelectIcon name="chevron-left" />
           </MonthSelectButton>
 
-          <Month>Maio</Month>
+          <Month>{format(selectedDate, 'MMMM, yyyy', { locale: ptBR })}</Month>
 
-          <MonthSelectButton>
+          <MonthSelectButton onPress={() => handleDateChange('next')}>
             <MonthSelectIcon name="chevron-right" />
           </MonthSelectButton>
         </MonthSelect>

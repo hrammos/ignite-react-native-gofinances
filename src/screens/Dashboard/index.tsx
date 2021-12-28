@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { HighlightCard, TransactionCard } from '../../components';
+import { HighlightCard, Loading, TransactionCard } from '../../components';
 
 import { 
   Container, 
@@ -18,8 +18,7 @@ import {
   HighlightCards,
   Transactions,
   Title,
-  TransactionList,
-  LoadingContainer
+  TransactionList
 } from './styles';
 
 import { TTransactionCard } from '../../components/TransactionCard';
@@ -44,8 +43,6 @@ export const Dashboard = () => {
   const [transactions, setTransactions] = useState<TTransactions[]>([]);
   const [highlightData, setHighlightData] = useState<THighlightData>({} as THighlightData);
   const [isLoading, setIsLoading] = useState(true);
-
-  const { colors } = useTheme();
 
   const getLastTransactionDate = (collection: TTransactions[], type: 'positive' | 'negative') => {
     const lastTransaction = new Date(Math.max.apply(Math, collection
@@ -137,11 +134,7 @@ export const Dashboard = () => {
     }, [])
   );
 
-  if (isLoading) return (
-    <LoadingContainer>
-      <ActivityIndicator color={colors.primary} size="large" />
-    </LoadingContainer> 
-  )
+  if (isLoading) return <Loading />
 
   return (
     <Container>
