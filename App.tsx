@@ -15,6 +15,7 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { AppRoutes } from './src/routes/app.routes';
 import { theme } from './src/global/styles/theme';
+import { AuthProvider } from './src/hooks/auth'
 
 import { SignIn } from './src/screens';
 
@@ -36,7 +37,9 @@ export default function App() {
           barStyle="light-content"
         />
         {/* <AppRoutes /> */}
-        <SignIn />
+        <AuthProvider>
+          <SignIn />
+        </AuthProvider>
       </NavigationContainer>
     </ThemeProvider>
   );
