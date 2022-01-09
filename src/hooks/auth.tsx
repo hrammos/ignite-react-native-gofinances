@@ -31,6 +31,8 @@ type TUseAuth = {
   user: TUser;
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
+  signOut: () => Promise<void>;
+  userStoragedLoading: boolean;
 };
 
 
@@ -70,6 +72,7 @@ export const AuthProvider = (props: TAuthProviderProps) => {
         }
 
         setUser(userLogged);
+
         await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
       }
 
@@ -88,20 +91,30 @@ export const AuthProvider = (props: TAuthProviderProps) => {
       });
 
       if (credential) {
+        const name = credential.fullName!.givenName!
+        const photo = `https://ui-avatars.com/api/?name=${name}length=1`;
+
         const userLogged = {
           id: String(credential.user),
           email: credential.email!,
-          name: credential.fullName!.givenName!,
-          photo: undefined
+          name,
+          photo,
         }
 
         setUser(userLogged);
+
         await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
       }
 
     } catch (error) {
       throw new Error(error as string);
     }
+  };
+
+  const signOut = async () => {
+    setUser({} as TUser);
+    
+    await AsyncStorage.removeItem(userStorageKey);
   };
 
   useEffect(() => {
@@ -125,6 +138,8 @@ export const AuthProvider = (props: TAuthProviderProps) => {
       user,
       signInWithGoogle,
       signInWithApple,
+      signOut,
+      userStoragedLoading
     }}>
       {children}
     </AuthContext.Provider>

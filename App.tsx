@@ -13,7 +13,7 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { theme } from './src/global/styles/theme';
-import { AuthProvider } from './src/hooks/auth';
+import { AuthProvider, useAuth } from './src/hooks/auth';
 
 import { Routes } from './src/routes';
 
@@ -24,7 +24,9 @@ export default function App() {
     Poppins_700Bold,
   }); 
 
-  if (!fontsLoaded) return <AppLoading />
+  const { userStoragedLoading } = useAuth();
+
+  if (!fontsLoaded || userStoragedLoading) return <AppLoading />
   
   return (
     <ThemeProvider theme={theme}>

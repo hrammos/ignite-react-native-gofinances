@@ -22,7 +22,8 @@ import {
 } from './styles';
 
 import { TTransactionCard } from '../../components/TransactionCard';
-import { useTheme } from 'styled-components/native';
+
+import { useAuth } from '../../hooks/auth';
 
 export type TTransactions = TTransactionCard & {
   id: string;
@@ -43,6 +44,8 @@ export const Dashboard = () => {
   const [transactions, setTransactions] = useState<TTransactions[]>([]);
   const [highlightData, setHighlightData] = useState<THighlightData>({} as THighlightData);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { user, signOut } = useAuth();
 
   const getLastTransactionDate = (collection: TTransactions[], type: 'positive' | 'negative') => {
     const lastTransaction = new Date(Math.max.apply(Math, collection
@@ -142,15 +145,15 @@ export const Dashboard = () => {
         <UserWrapper>
           <UserInfo>
             <Photo 
-              source={{ uri: 'https://avatars.githubusercontent.com/u/28076738?v=4' }}
+              source={{ uri: user.photo }}
             />
             <User>
               <UserGreeting>Olá,</UserGreeting>
-              <UserName>Henrique</UserName>
+              <UserName>{user.name}</UserName>
             </User>
           </UserInfo>
           
-          <LogoutButton onPress={() => {}}>
+          <LogoutButton onPress={signOut}>
             <Icon name="power" />
           </LogoutButton>
         </UserWrapper>
