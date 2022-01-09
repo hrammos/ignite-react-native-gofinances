@@ -12,12 +12,10 @@ import {
   Poppins_500Medium,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
-import { NavigationContainer } from '@react-navigation/native';
-import { AppRoutes } from './src/routes/app.routes';
 import { theme } from './src/global/styles/theme';
-import { AuthProvider } from './src/hooks/auth'
+import { AuthProvider } from './src/hooks/auth';
 
-import { SignIn } from './src/screens';
+import { Routes } from './src/routes';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -30,17 +28,14 @@ export default function App() {
   
   return (
     <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        <StatusBar 
-          translucent 
-          backgroundColor={theme.colors.primary}
-          barStyle="light-content"
-        />
-        {/* <AppRoutes /> */}
-        <AuthProvider>
-          <SignIn />
-        </AuthProvider>
-      </NavigationContainer>
+      <StatusBar 
+        translucent 
+        backgroundColor={theme.colors.primary}
+        barStyle="light-content"
+      />
+      <AuthProvider>
+        <Routes />
+      </AuthProvider>
     </ThemeProvider>
   );
 }
