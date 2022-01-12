@@ -16,6 +16,7 @@ import {
   ParamListBase,
 } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../hooks/auth';
 
 import { CategorySelect } from '../../screens';
 
@@ -59,7 +60,7 @@ export const Register = () => {
     name: 'Categoria',
   });
 
-
+  const { user } = useAuth();
   const { navigate }: NavigationProp<ParamListBase> = useNavigation();
 
   const { 
@@ -102,7 +103,7 @@ export const Register = () => {
     };
 
     try {
-      const dataKey = '@gofinances:transactions';
+      const dataKey = `@gofinances:transactions_user:${user.id}`;
       const transactions = await AsyncStorage.getItem(dataKey);
       const currentTransactions = transactions ? JSON.parse(transactions) : [];
 

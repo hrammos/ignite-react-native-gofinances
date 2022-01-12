@@ -7,6 +7,7 @@ import { addMonths, subMonths, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'styled-components/native';
+import { useAuth } from '../../hooks/auth';
 
 import { HistoryCard, Loading } from '../../components';
 
@@ -40,6 +41,7 @@ export const Resume = () => {
   const [totalByCategories, setTotalByCategories] = useState<TCategoryData[]>([]);
 
   const { colors } = useTheme();
+  const { user } = useAuth();
 
   const handleDateChange = (action: 'next' | 'prev') => {
     if (action === 'next') {
@@ -52,7 +54,7 @@ export const Resume = () => {
   const loadData = async () => {
     setIsLoading(true);
 
-    const dataKey = '@gofinances:transactions';
+    const dataKey = `@gofinances:transactions_user:${user.id}`;
     const transactions = await AsyncStorage.getItem(dataKey);
     const currentTransactions = transactions ? JSON.parse(transactions) : [];
 
